@@ -4,12 +4,14 @@ metadata:
   name: {{ include "zookeeper-cluster.fullname" . }}
   labels: {{- include "zookeeper-cluster.labels" . | nindent 4 }}
 spec:
-  serviceName: zookeeper-headless
+  serviceName: {{ include "zookeeper-cluster.fullname" . }}-headless
   replicas: 3
   selector:
     matchLabels: {{- include "zookeeper-cluster.labels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
       labels: {{- include "zookeeper-cluster.labels" . | nindent 8 }}
     spec:
       affinity:
@@ -20,7 +22,7 @@ spec:
                   - key: "app"
                     operator: In
                     values:
-                    - zookeeper
+                    - zookeeper-cluster
               topologyKey: "kubernetes.io/hostname"
       containers:
       - name: kubernetes-zookeeper

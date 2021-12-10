@@ -14,7 +14,7 @@ Name of Release. fully qualified app name.
 {{- end -}}
 
 {{/*
-labels of chart
+Labels of Chart.
 */}}
 {{- define "zookeeper-cluster.labels" -}}
 app: {{ .Release.Name }}
