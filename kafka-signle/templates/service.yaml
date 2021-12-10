@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kafka-signle.fullname" . }}
+  labels: {{- include "kafka-signle.labels" . | nindent 4 }}
+spec:
+  selector: {{- include "kafka-signle.labels" . | nindent 4 }}
+  type: NodePort
+  ports:
+  - name: kafka-port
+    port: 9092
+    targetPort: 9092
+    nodePort: 30092
+  
