@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "zookeeper-cluster.fullname" }}
-  labels: {{- include "zookeeper-cluster.labels" | nindent 4 }}
+  name: {{ include "zookeeper-cluster.fullname" . }}
+  labels: {{- include "zookeeper-cluster.labels" . | nindent 4 }}
 spec:
   serviceName: zookeeper-headless
   replicas: 3
   selector:
-    matchLabels: {{- include "zookeeper-cluster.labels" | nindent 6 }}
+    matchLabels: {{- include "zookeeper-cluster.labels" . | nindent 6 }}
   template:
     metadata:
-      labels: {{- include "zookeeper-cluster.labels" | nindent 8 }}
+      labels: {{- include "zookeeper-cluster.labels" . | nindent 8 }}
     spec:
       affinity:
         podAntiAffinity:
@@ -79,11 +79,12 @@ spec:
           mountPath: /var/lib/zookeeper
   volumeClaimTemplates:
   - metadata:
-      name: {{ include "zookeeper-cluster.fullname" }}
-      labels: {{- include "zookeeper-cluster.labels" | nindent 8 }}
+      name: datadir
+      labels: {{- include "zookeeper-cluster.labels" . | nindent 8 }}
     spec:
       accessModes:
-        - ReadWriteMany
+        - ReadWriteOnce
       resources:
         requests:
           storage: 1Gi
+      storageClassName: local-path

@@ -2,7 +2,7 @@
 Name of Chart.
 */}}
 {{- define "zookeeper-cluster.name" -}}
-{{ .Chart.Name }}
+{{- .Chart.Name }}
 {{- end -}}
 
 
@@ -10,7 +10,7 @@ Name of Chart.
 Name of Release. fully qualified app name.
 */}}
 {{- define "zookeeper-cluster.fullname" -}}
-{{ .Release.Name }}
+{{- .Release.Name }}
 {{- end -}}
 
 {{/*
