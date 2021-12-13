@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "kafka-cluster.fullname" . }}
+  labels: {{- include "kafka-cluster.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "kafka-cluster.fullname" . }}-headless
+  replicas: 3
+  selector:
+    matchLabels: {{- include "kafka-cluster.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "kafka-cluster.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: kafka
+        imagePullPolicy: Always
+        image: registry.cn-hangzhou.aliyuncs.com/ccgg/k8skafka:v1
+        ports:
+        - containerPort: 9093
+          name: server
+        command:
+        - sh
+        - -c
+        - "exec kafka-server-start.sh /opt/kafka/config/server.properties --override broker.id=${HOSTNAME##*-} \   
+          --override listeners=PLAINTEXT://:9093 \
+          --override zookeeper.connect=zookeeper-cluster:2181/kafka-cluster \
+          --override log.dir=/var/lib/kafka "
+        env:
+        - name: KAFKA_HEAP_OPTS
+          value : "-Xmx512M -Xms512M"
+        - name: KAFKA_OPTS
+          value: "-Dlogging.level=INFO"
+        volumeMounts:
+        - name: datadir
+          mountPath: /var/lib/kafka
+        readinessProbe:
+          exec:
+           command: 
+            - sh 
+            - -c 
+            - "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server=localhost:9093"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values: 
+                    - kafka-cluster
+              topologyKey: "kubernetes.io/hostname"
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      labels: {{- include "kafka-cluster.labels" . | nindent 8 }}
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: local-path
