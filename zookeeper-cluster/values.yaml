@@ -1,0 +1,9 @@
+storage:
+  # local-path cds-hp1
+  className: cds-hp1
+  requests: 5Gi
+
+image:
+  port: 2181
+  # 32181 8181
+  nodePort: 8181

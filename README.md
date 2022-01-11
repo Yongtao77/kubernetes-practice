@@ -47,9 +47,9 @@ helm upgrade --install kafka-cluster . --cleanup-on-fail
 kafka-topics.sh --create --topic demo-aaa --partitions 3 --replication-factor 2 --zookeeper zookeeper-cluster:2181/kafka-cluster
 
 # 消费者
-kafka-console-consumer.sh --topic demo-aaa --bootstrap-server localhost:9093
+kafka-console-consumer.sh --topic demo-aaa --bootstrap-server kafka-cluster:9093
 # 生产者
-kafka-console-producer.sh --topic demo-aaa --broker-list localhost:9093
+kafka-console-producer.sh --topic demo-aaa --broker-list kafka-cluster:9093
 
 # 管理brokers
 zookeeper-shell.sh zookeeper-cluster:2181 ls /brokers/ids

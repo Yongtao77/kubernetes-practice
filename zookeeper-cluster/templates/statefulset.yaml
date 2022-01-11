@@ -33,12 +33,12 @@ spec:
             memory: "1024Mi"
             cpu: "500m"
         ports:
-        - containerPort: 2181
-          name: client
-        - containerPort: 2888
-          name: server
-        - containerPort: 3888
-          name: leader-election
+        - name: client
+          containerPort: {{ .Values.image.port }}
+        - name: server
+          containerPort: 2888
+        - name: leader-election
+          containerPort: 3888
         command:
         - sh
         - -c
@@ -47,7 +47,7 @@ spec:
           --data_dir=/var/lib/zookeeper/data \
           --data_log_dir=/var/lib/zookeeper/data/log \
           --conf_dir=/opt/zookeeper/conf \
-          --client_port=2181 \
+          --client_port={{ .Values.image.port }} \
           --election_port=3888 \
           --server_port=2888 \
           --tick_time=2000 \
@@ -88,5 +88,5 @@ spec:
         - ReadWriteOnce
       resources:
         requests:
-          storage: 1Gi
-      storageClassName: local-path
+          storage: {{ .Values.storage.requests }}
+      storageClassName: {{ .Values.storage.className }}

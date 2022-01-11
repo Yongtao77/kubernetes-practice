@@ -7,7 +7,7 @@ spec:
   selector: {{- include "zookeeper-cluster.labels" . | nindent 4 }}
   ports:
   - name: client
-    port: 2181
-    targetPort: 2181
-    nodePort: 32181
+    port: {{ .Values.image.port }}
+    targetPort: {{ .Values.image.port }}
+    nodePort: {{ .Values.image.nodePort }}
   type: NodePort
