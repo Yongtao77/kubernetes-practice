@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm-demo.fullname" . }}
+  labels:
+    {{- include "helm-demo.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels: {{- include "helm-demo.labels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        app.kubernetes.io/publish-time: {{ now.Format "2006-01-02 15:04:05" | quote }}
+      labels:
+        {{- include "helm-demo.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ include "helm-demo.name" . }}
+        image: {{ print .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion ) }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy | default "IfNotPresent" }}
+        ports:
+        - containerPort: {{ .Values.image.mainPort }}
+          name: main-port
+          protocol: TCP
+        {{- with .Values.image.env }}
+        env: {{ toYaml . | nindent 10 }}
+        {{- end }}
+        resources:
+          limits:
+            cpu: "1000m"
+            memory: 1024Mi
+          requests:
+            cpu: "200m"
+            memory: 200Mi
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "2"
+      dnsPolicy: ClusterFirst
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "helm-demo.fullname" . }}
+
