@@ -7,10 +7,10 @@ replicaCount: 1
 image:
   mainPort: 8080
   repository: registry.baidubce.com/aff_inf/helm-demo
-  tag: mysql5.7
+  tag: "mysql5.7"
   env:
     - name: MYSQL_ROOT_PASSWORD
-      values: password
+      value: password
 
 imagePullSecrets:
   - name: aff-docker-registry
