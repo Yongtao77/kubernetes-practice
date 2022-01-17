@@ -18,7 +18,7 @@ spec:
       containers:
       - name: {{ include "helm-demo.name" . }}
         image: {{ print .Values.image.repository ":" .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.imagePullPolicy | default "IfNotPresent" }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy | default "Alwaly" }}
         ports:
         - containerPort: {{ .Values.image.mainPort }}
           name: main-port
@@ -33,10 +33,6 @@ spec:
           requests:
             cpu: "200m"
             memory: 200Mi
-      dnsConfig:
-        options:
-        - name: ndots
-          value: "2"
       dnsPolicy: ClusterFirst
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets: {{ toYaml . | nindent 8 }}
