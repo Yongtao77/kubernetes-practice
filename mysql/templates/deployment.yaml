@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mysql.fullname" . }}
+  labels:
+    {{- include "mysql.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels: {{- include "mysql.labels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "mysql.labels" . | nindent 8 }}
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - name: {{ include "mysql.name" . }}
+        image: {{ print .Values.image.repository ":" .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.imagePullPolicy | default "IfNotPresent" }}
+        ports:
+        - containerPort: {{ .Values.image.mainPort }}
+          name: main-port
+          protocol: TCP
+        {{- with .Values.image.env }}
+        env: {{ toYaml . | nindent 8 }}
+        {{- end }}
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: {{ include "mysql.fullname" . }}-pvc
+

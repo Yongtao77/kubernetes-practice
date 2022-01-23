@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels: {{ include "mysql.labels" . | nindent 4 }}
+  name: {{ include "mysql.fullname" . }}-np
+spec:
+  ports:
+  - name: main-port
+    nodePort: {{ .Values.image.nodePort }}
+    port: {{ .Values.image.mainPort }}
+    protocol: TCP
+    targetPort: {{ .Values.image.mainPort }}
+  selector: {{ include "mysql.labels" . | nindent 4 }}
+  type: NodePort
